@@ -1,5 +1,5 @@
 <?php
-function build_calender($month, %year){
+function build_calender($month, $year){
     //create array of days of the week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
     
@@ -59,9 +59,7 @@ function build_calender($month, %year){
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
 
-        $calender.= "<td><h4>$currentDay</h4>
-
-        $calender.= "</td>";
+        $calender.= "<td><h4>$currentDay</h4></td>";
 
         //increment counters
         $currentDay++;
@@ -82,6 +80,7 @@ function build_calender($month, %year){
 
     echo $calender;
 }
+
 ?>
 <html>
     <head>
