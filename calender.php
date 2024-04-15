@@ -16,7 +16,7 @@ function build_calender($month, $year){
     $monthName = $dateComponents['month'];
 
     //get index value of the first day of the month
-    $dayOfWeek = $dateComponents['wday'];
+    $dayOfWeek = ($dateComponents['wday'] + 6) % 7;
 
     //get current date
     $dateToday = date('Y-m-d');
@@ -49,7 +49,7 @@ function build_calender($month, $year){
 
     while($currentDay <= $numberDays){
 
-        //if isevength coloumn (sunday), start a new row
+        //if is seventh coloumn (sunday), start a new row
         if($dayOfWeek == 7){
             $dayOfWeek = 0;
             $calender .= "</tr><tr>";
