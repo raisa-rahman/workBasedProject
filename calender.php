@@ -59,7 +59,11 @@ function build_calender($month, $year){
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
 
-        $calender.= "<td><h4>$currentDay</h4></td>";
+        if($dateToday == $date){
+            $calender .= "<td class='today'>$currentDay</td>";
+        }else{
+            $calender .= "<td>$currentDay</td>";
+        }
 
         //increment counters
         $currentDay++;
