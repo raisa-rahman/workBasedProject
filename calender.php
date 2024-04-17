@@ -1,5 +1,5 @@
 <?php
-function build_calender($month, $year){
+function build_calendar($month, $year){
     //create array of days of the week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
     
@@ -22,22 +22,26 @@ function build_calender($month, $year){
     $dateToday = date('Y-m-d');
 
     //create HTML table
-    $calender = "<table class='table table-bordered'>";
-    $calender .= "<center><h2>$monthName $year</h2></center>";
-    
-    $calender .= "<tr>";
+    $calendar = "<table class='table table-bordered'>";
+    $calendar .= "<center><h2>$monthName $year</h2>";
+    $calendar.="<a class='btn btn-xs btn primary' href='?month=".date('m',mktime(0,0,0,$month-1,1,$year))."&year=".date('Y',mktime(0,0,0,$month-1,1,$year))."'>Previous Month</a>";
 
-    //create calender headers
+    $calendar.="<a class='btn btn-xs btn primary' href'?month=".date('m',mktime(0,0,0,$month+1,1,$year))."&year=".date('Y',mktime(0,0,0,$month+1,1,$year))."'>Next Month</a></center>";
+
+    
+    $calendar .= "<tr>";
+
+    //create calendar headers
     foreach($daysOfWeek as $day){
-        $calender .= "<th class='header'>$day</th>";
+        $calendar .= "<th class='header'>$day</th>";
     }
 
-    $calender .= "</tr><tr>";
+    $calendar .= "</tr><tr>";
 
     //$dayOfWeek ensures there are only 7 columns on table
-    if($daysOfWeek > 0){
+    if($dayOfWeek > 0){
         for($k=0; $k<$dayOfWeek; $k++){
-            $calender .= "<td></td>";
+            $calendar .= "<td></td>";
         }
     }
 
@@ -49,10 +53,10 @@ function build_calender($month, $year){
 
     while($currentDay <= $numberDays){
 
-        //if is seventh coloumn (sunday), start a new row
+        //if is seventh column (Sunday), start a new row
         if($dayOfWeek == 7){
             $dayOfWeek = 0;
-            $calender .= "</tr><tr>";
+            $calendar .= "</tr><tr>";
         }
 
 
@@ -60,9 +64,9 @@ function build_calender($month, $year){
         $date = "$year-$month-$currentDayRel";
 
         if($dateToday == $date){
-            $calender .= "<td class='today'>$currentDay</td>";
+            $calendar .= "<td class='today'>$currentDay</td>";
         }else{
-            $calender .= "<td>$currentDay</td>";
+            $calendar .= "<td>$currentDay</td>";
         }
 
         //increment counters
@@ -75,14 +79,14 @@ function build_calender($month, $year){
     if($dayOfWeek != 7){
         $remainingDays = 7 - $dayOfWeek;
         for($i=0; $i<$remainingDays; $i++){
-            $calender .= "<td></td>";
+            $calendar .= "<td></td>";
         }
     }
 
-    $calender .= "</tr>";
-    $calender .= "</table>";
+    $calendar .= "</tr>";
+    $calendar .= "</table>";
 
-    echo $calender;
+    return $calendar;
 }
 
 ?>
@@ -90,19 +94,19 @@ function build_calender($month, $year){
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <?php
-                $dateComponents = getdate();
-                $month = $dateComponents['mon'];
-                $year = $dateComponents['year'];
-                echo build_calender($month, $year);
-                ?>
-             </div>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <?php
+                    $dateComponents = getdate();
+                    $month = $dateComponents['mon'];
+                    $year = $dateComponents['year'];
+                    echo build_calendar($month, $year);
+                    ?>
+                 </div>
+                </div>
             </div>
-        </div>
-    </body>
-</html>
+        </body>
+    </html>
