@@ -1,10 +1,19 @@
 <?php
+
+//Function to build a celender for a specific month and year
 function build_calendar($month,$year){
 
-    /*$mysqli = new mysqli('localhost','root','','bookingcalendar');
+    // connect to the database
+    $mysqli = new mysqli('localhost','root','','bookingcalendar');
+
+    // prepare the query to retrieve the bookings for month and year
     $stmt = $mysqli->prepare("select * from bookings where MONTH(date) = ? AND YEAR(date) = ?");
     $stmt->bind_param('ss', $month, $year);
+
+    //array to store booking dates
     $bookings = array();
+
+    //execute query and fetch results
     if($stmt->execute()){
         $result = $stmt -> get_result();
         if ($result -> num_rows . 0){
@@ -13,31 +22,44 @@ function build_calendar($month,$year){
             }
             $stmt->close();
         }
-    }*/
+    }
 
+    //array of days of week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+   
+   // get timestamp for first day of the month
     $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
+
+    //get number of days in month
     $numberDays = date('t', $firstDayOfMonth);
+
+    //get date components for first day of month
     $dateComponents = getdate($firstDayOfMonth);
     $monthName = $dateComponents['month'];
     $dayOfWeek = $dateComponents['wday'];
     $dateToday = date('Y-m-d');
 
+    //calculate previous and next month/year
     $prev_month = date('m', mktime(0,0,0,$month-1,1,$year));
     $prev_year = date('Y', mktime(0,0,0,$month-1,1,$year));
     $next_month = date('m', mktime(0,0,0,$month+1,1,$year));
     $next_year = date('Y', mktime(0,0,0,$month+1,1,$year));
     $calendar = "<center><h2>$monthName $year </h2>";
+
+    //build calender HTML
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".$prev_month."&year=".$prev_year."'>Previous Month</a> ";
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".date('m')."&year=".date('Y')."'>Current Month</a> ";
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".$next_month."&year=".$next_year."'>Next Month</a></center>";
     $calendar.="<br><table class='table table-bordered'>";
     $calendar.="<tr>";
+
+    //generate table headers for days of week
     foreach($daysOfWeek as $day){
         $calendar.="<th class='header'>$day</th>";
     }
-
     $calendar.="</tr><tr>";
+
+    //fill in empty cells before first day of month
     $currentDay = 1;
     if($dayOfWeek > 0){
         for($k=0; $k<$dayOfWeek; $k++){
@@ -45,6 +67,7 @@ function build_calendar($month,$year){
         }
     }
 
+    //loop through each day of the month
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
     while($currentDay <= $numberDays){
         if($dayOfWeek == 7){
@@ -52,19 +75,19 @@ function build_calendar($month,$year){
             $calendar.="</tr><tr>";
         }
 
+        //format the date
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
         $dayName = strtolower(date('l', strtotime($date)));
         $today = $date == date('Y-m-d')? "today" : "";
-       /* if(in_array($date, $bookings)){
-            $calendar.="<td class='$today'><h4>$currentDay</h4><a class='btn bt-danger btn-xs'>Booked</a></td>";
-        }else{
-            $calendar.="<td class='$today'><h4>$currentDay</h4><a class='btn bt-success btn-xs book-button'>Book</a></td>";
-        }   */
-        
+
+        //check if date is in past, available or booked
         if($date<date('Y-m-d')){
             $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>N/A</button>";
 
+        }elseif(in_array($date, $bookings)){
+            $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>Already Booked</button>";
+        
         }else{
             $calendar.="<td class='$today'><h4>$currentDay</h4><a href = 'book.php?date=".$date."' class='btn bt-success btn-xs'>Book</a>";
         }
@@ -75,6 +98,7 @@ function build_calendar($month,$year){
     
     }
 
+    //fill in empty cells afetr last day of month
     if($dayOfWeek != 7){
         $remainingDays = 7 - $dayOfWeek;
         for($i=0; $i<$remainingDays; $i++){
