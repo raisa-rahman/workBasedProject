@@ -6,7 +6,7 @@ function build_calendar($month,$year){
     // connect to the database
     $mysqli = new mysqli('localhost','root','','bookingcalendar');
 
-    // prepare the query to retrieve the bookings for month and year
+   /* // prepare the query to retrieve the bookings for month and year
     $stmt = $mysqli->prepare("select * from bookings where MONTH(date) = ? AND YEAR(date) = ?");
     $stmt->bind_param('ss', $month, $year);
 
@@ -22,7 +22,7 @@ function build_calendar($month,$year){
             }
             $stmt->close();
         }
-    }
+    }*/
 
     //array of days of week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
@@ -85,9 +85,6 @@ function build_calendar($month,$year){
         if($date<date('Y-m-d')){
             $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>N/A</button>";
 
-        }elseif(in_array($date, $bookings)){
-            $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>Already Booked</button>";
-        
         }else{
             $calendar.="<td class='$today'><h4>$currentDay</h4><a href = 'book.php?date=".$date."' class='btn bt-success btn-xs'>Book</a>";
         }

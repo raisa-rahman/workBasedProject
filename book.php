@@ -4,11 +4,15 @@ if(isset($_GET['date'])){
 }
 
 if(isset($_POST['submit'])){
+  // Debug statement to check form data
+  //print_r($_POST);
+
   $name = $_POST['name'];
   $email = $_POST['email'];
+  $timeslot = $_POST['timeslot'];
   $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
   $stmt = $mysqli->prepare("INSERT INTO bookings (name, email, date, timeslot) values (?,?,?,?)");
-  $stmt->bind_param('ssss', $name, $email, $date, $_POST['timeslot']);
+  $stmt->bind_param('ssss', $name, $email, $date, $timeslot);
   $stmt->execute();
   $msg = "<div class='alert alert-success'>Booking Successfull</div>";
   $stmt->close();
@@ -74,13 +78,42 @@ function timeslots($duration, $cleanup, $start, $end){
                         $disabled = "disabled";
                     }
                 ?>
-                <form method="post">
-                    <input type="hidden" name="timeslot" value="<?php echo $option; ?>">
-                    <button class="btn btn-success <?php echo $disabled; ?>"><?php echo $option; ?></button>
-                </form>
+                <button class="btn btn-success book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-timeslot="<?php echo $option; ?>"><?php echo $option; ?></button>
             </div>
         <?php endforeach; ?>
     </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Booking: <span id = "slot" ></span> </h4>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <form action = "" method = "post">
+            <div class="form-group">
+              <label for="">Timeslot</label>
+              <input required type="text" readonly name="timeslot" id="timeslot" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="">Name</label>
+              <input required type="text" name="name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="">Email</label>
+              <input required type="email" name="email" class="form-control">
+            </div>
+            <div class="form-group pull-right">
+              <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+          </div>
+        </div>
+
+  </div>
 </div>
 
 <!-- Optional JavaScript -->
@@ -88,6 +121,14 @@ function timeslots($duration, $cleanup, $start, $end){
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+  $(".book").click(function(){
+    var timeslot = $(this).attr('data-timeslot');
+    $("#slot").html(timeslot);
+    $("#timeslot").val(timeslot);
+    $("#myModal").modal("show");
+  });
+</script>
 </body>
 </html>
 
@@ -97,6 +138,7 @@ function checkIfTimeslotBooked($timeslot) {
     // Implement your logic here to check if the timeslot is booked
     // You can query your database to check if any bookings overlap with the provided timeslot
     // Return true if booked, false otherwise
+    
     return false; // Sample implementation assuming no bookings exist
 }
 ?>
