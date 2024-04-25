@@ -9,28 +9,37 @@ if(isset($_POST['submit'])){
 
   $name = $_POST['name'];
   $email = $_POST['email'];
-  $timeslot = $_POST['timeslot'];
+  $desk = $_POST['desk'];
   $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
-  $stmt = $mysqli->prepare("INSERT INTO bookings (name, email, date, timeslot) values (?,?,?,?)");
-  $stmt->bind_param('ssss', $name, $email, $date, $timeslot);
+  $stmt = $mysqli->prepare("INSERT INTO bookings (name, email, date, desk) values (?,?,?,?)");
+  $stmt->bind_param('ssss', $name, $email, $date, $desk);
   $stmt->execute();
   $msg = "<div class='alert alert-success'>Booking Successfull</div>";
   $stmt->close();
   $mysqli->close();
 }
 
-$timeslot_options = array(
-  "9:00AM - 1:00PM",
-  "1:00PM - 5:00PM",
-  "9:00AM - 5:00PM"
+$desk_options = array(
+  "Desk 1",
+  "Desk 2",
+  "Desk 3",
+  "Desk 4",
+  "Desk 5",
+  "Desk 6",
+  "Desk 7",
+  "Desk 8",
+  "Desk 9",
+  "Desk 10",
+  "Desk 11"
 );
+
 
 $duration = 200;
 $cleanup = 0;
 $start = "09:00"; 
 $end = "17:00";
 
-function timeslots($duration, $cleanup, $start, $end){
+function desks($duration, $cleanup, $start, $end){
   $start = new DateTime($start);
   $end = new DateTime($end);
   $interval = new DateInterval("PT".$duration."M");
@@ -68,17 +77,17 @@ function timeslots($duration, $cleanup, $start, $end){
 <div class="container">
     <h1 class="text-center">Book for Date: <?php echo date('F d,Y', strtotime($date)); ?> </h1><hr>
     <div class="row">
-        <?php foreach($timeslot_options as $option): ?>
+        <?php foreach($desk_options as $option): ?>
             <div class="col-md-4">
                   <?php
                     $disabled = ""; // Determine if the option should be disabled
-                    // Check if the timeslot is already booked
+                    // Check if the desk is already booked
                     // If it's already booked, disable the option
-                    if(checkIfTimeslotBooked($option)) {
+                    if(checkIfDeskBooked($option)) {
                         $disabled = "disabled";
                     }
                 ?>
-                <button class="btn btn-success book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-timeslot="<?php echo $option; ?>"><?php echo $option; ?></button>
+                <button class="btn btn-success book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-desk="<?php echo $option; ?>"><?php echo $option; ?></button>
             </div>
         <?php endforeach; ?>
     </div>
@@ -97,8 +106,8 @@ function timeslots($duration, $cleanup, $start, $end){
         <div class="col-md-12">
           <form action = "" method = "post">
             <div class="form-group">
-              <label for="">Timeslot</label>
-              <input required type="text" readonly name="timeslot" id="timeslot" class="form-control">
+              <label for="">Desk</label>
+              <input required type="text" readonly name="desk" id="desk" class="form-control">
             </div>
             <div class="form-group">
               <label for="">Name</label>
@@ -123,9 +132,9 @@ function timeslots($duration, $cleanup, $start, $end){
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
   $(".book").click(function(){
-    var timeslot = $(this).attr('data-timeslot');
-    $("#slot").html(timeslot);
-    $("#timeslot").val(timeslot);
+    var desk = $(this).attr('data-desk');
+    $("#slot").html(desk);
+    $("#desk").val(desk);
     $("#myModal").modal("show");
   });
 </script>
@@ -133,10 +142,10 @@ function timeslots($duration, $cleanup, $start, $end){
 </html>
 
 <?php
-// Function to check if a timeslot is already booked
-function checkIfTimeslotBooked($timeslot) {
-    // Implement your logic here to check if the timeslot is booked
-    // You can query your database to check if any bookings overlap with the provided timeslot
+// Function to check if a desk is already booked
+function checkIfDeskBooked($desk) {
+    // Implement your logic here to check if the desk is booked
+    // You can query your database to check if any bookings overlap with the provided desk
     // Return true if booked, false otherwise
     
     return false; // Sample implementation assuming no bookings exist
