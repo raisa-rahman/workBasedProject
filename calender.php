@@ -1,5 +1,7 @@
 <?php
-function build_calendar($month, $year){
+
+//Function to build a celender for a specific month and year
+function build_calendar($month,$year){
     //create array of days of the week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
     

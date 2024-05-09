@@ -1,15 +1,32 @@
 <?php
-
 //Function to build a celender for a specific month and year
 function build_calendar($month,$year){
 
-    // connect to the database
-    $mysqli = new mysqli('localhost','root','','bookingcalendar');
+   // connect to the database
+   $mysqli = new mysqli('localhost','root','','bookingcalendar');
 
-    //array of days of week
+   // prepare the query to retrieve the bookings for month and year
+    $stmt = $mysqli->prepare("select * from bookings where MONTH(date) = ? AND YEAR(date) = ?");
+    $stmt->bind_param('ss', $month, $year);
+
+    //array to store booking dates
+    $bookings = array();
+
+     //execute query and fetch results
+    if($stmt->execute()){
+        $result = $stmt -> get_result();
+        if ($result -> num_rows . 0){
+            while ($row = $result -> fetch_assoc()){
+                $bookings[] = $row['date'];
+            }
+            $stmt->close();
+        }
+    }
+
+        //array of days of week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-   
-   // get timestamp for first day of the month
+
+     // get timestamp for first day of the month
     $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
 
     //get number of days in month
@@ -19,12 +36,6 @@ function build_calendar($month,$year){
     $dateComponents = getdate($firstDayOfMonth);
     $monthName = $dateComponents['month'];
     $dayOfWeek = $dateComponents['wday'];
-    if($dayOfWeek == 0){
-        $dayOfWeek = 6;
-    }else{
-        $dayOfWeek = $dayOfWeek - 1;
-    }
-
     $dateToday = date('Y-m-d');
 
     //calculate previous and next month/year
@@ -32,22 +43,34 @@ function build_calendar($month,$year){
     $prev_year = date('Y', mktime(0,0,0,$month-1,1,$year));
     $next_month = date('m', mktime(0,0,0,$month+1,1,$year));
     $next_year = date('Y', mktime(0,0,0,$month+1,1,$year));
-    $calendar = "<center><h2>$monthName $year </h2>";
 
     //build calender HTML
+    $calendar = "<center><h2>$monthName $year </h2>";
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".$prev_month."&year=".$prev_year."'>Previous Month</a> ";
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".date('m')."&year=".date('Y')."'>Current Month</a> ";
     $calendar.="<a class='btn btn-primary btn-xs' href='?month=".$next_month."&year=".$next_year."'>Next Month</a></center>";
-    $calendar.="<br><table class='table table-bordered'>";
+    $calendar.="
+    <form id = 'room_select_form'>
+        div class = 'row'>
+            <div class = 'col-md-12-offset-3'>
+                <label>Choose Room</label>
+                <select class = 'form-control' id = 'room_select'>
+                </select>
+            </div>
+        </div>
+    </form>
+    
+    <table class='table table-bordered'>";
     $calendar.="<tr>";
 
     //generate table headers for days of week
     foreach($daysOfWeek as $day){
         $calendar.="<th class='header'>$day</th>";
     }
+
     $calendar.="</tr><tr>";
 
-    //fill in empty cells before first day of month
+     //fill in empty cells before first day of month
     $currentDay = 1;
     if($dayOfWeek > 0){
         for($k=0; $k<$dayOfWeek; $k++){
@@ -66,29 +89,26 @@ function build_calendar($month,$year){
         //format the date
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
-
         $dayName = strtolower(date('l', strtotime($date)));
         $today = $date == date('Y-m-d')? "today" : "";
-    
-        if ($dayName=='saturday' || $dayName=='sunday'){
-            $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>N/A</button>";
-        }elseif($date<date('Y-m-d')){
-            $calendar.="<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>N/A</button>";
-        }else{
 
-            $totalbookings = checkSlots($mysqli, $date);
-            if($totalbookings == 11){
-                $calendar.="<td class='$today'><h4>$currentDay</h4><a href = '#' class='btn bt-danger btn-xs'>All Booked</a>";
-            }else{
-                $availableSlots = 11 - $totalbookings;
-            $calendar.="<td class='$today'><h4>$currentDay</h4><a href = 'book.php?date=".$date."' class='btn bt-success btn-xs'>Book</a><small><i>$availableSlots slots left </i></small>";
-            }
-        }
+        //check if date is in the past, available, or booked
+if ($date < date('Y-m-d')) {
+    $calendar .= "<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs'>N/A</button>";
+} else {
+    // Check if the date is booked
+    if (in_array($date, $bookings)) {
+        $calendar .= "<td class='$today'><h4>$currentDay</h4><button class='btn bt-danger btn-xs' disabled>Booked</button>";
+    } else {
+        $calendar .= "<td class='$today'><h4>$currentDay</h4><a href='book.php?date=$date' class='btn bt-success btn-xs'>Book</a>";
+    }
+}
+     
 
-        
+
         $currentDay++;
         $dayOfWeek++;
-    
+
     }
 
     //fill in empty cells afetr last day of month
@@ -105,30 +125,6 @@ function build_calendar($month,$year){
 
     return $calendar;
 }
-
-function checkSlots($mysqli, $date){
-    // prepare the query to retrieve the bookings for month and year
-    $stmt = $mysqli->prepare("select * from bookings where date = ?");
-    $stmt->bind_param('s', $date);
-
-    // counter to store total bookings
-    $totalbookings = 0;
-
-    //execute query and fetch results
-    if($stmt->execute()){
-        $result = $stmt -> get_result();
-        if ($result -> num_rows > 0){
-            while ($row = $result -> fetch_assoc()){
-                $totalbookings++;
-            }
-            $stmt->close();
-        }
-    }
-    return $totalbookings;
-}
-
-
-
 ?>
 <html>
     <head>
@@ -228,7 +224,7 @@ function checkSlots($mysqli, $date){
                 .today{
                     background-color: yellow;
                 }
-            
+
             </style>
         </head>
 
