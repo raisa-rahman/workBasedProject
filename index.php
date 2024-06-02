@@ -1,4 +1,11 @@
 <?php
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
 // Function to fetch available rooms from the database
 function get_rooms() {
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
@@ -21,7 +28,7 @@ function get_rooms() {
     return $rooms;
 }
 
-//Function to build a calendar for a specific month and year
+// Function to build a calendar for a specific month and year
 function build_calendar($month, $year, $room) {
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 
@@ -66,7 +73,7 @@ function build_calendar($month, $year, $room) {
     $calendar .= "<a class='btn btn-primary btn-xs' href='?month=".date('m')."&year=".date('Y')."&room=".$room."'>Current Month</a> ";
     $calendar .= "<a class='btn btn-primary btn-xs' href='?month=".$next_month."&year=".$next_year."&room=".$room."'>Next Month</a></center>";
     $calendar .= "
-    <form id='room_select_form'>
+    <form id='room_select_form' method='GET' action=''>
         <div class='col-md-6 col-md-offset-3 form-group'>
             <label>Choose Room</label>
             <select class='form-control' id='room_select' name='room'>
@@ -207,6 +214,27 @@ function build_calendar($month, $year, $room) {
     });
 
     $("#room_select option[value='<?php echo $room; ?>']").attr('selected', 'selected');
+</script>
+<script>
+    $.ajax({
+        url: 'calendar.php',
+        type: 'POST',
+        data: {'month': '<?php echo date ('m'); ?>', 'year':'<?php echo date ('Y');?>'},
+        success: function(data) {
+            $("#calendar").html(data);
+        }
+    });
+
+    $(document).on('click', '.changemonth', function(){
+        $.ajax({
+            url: 'calendar.php',
+            type: 'POST',
+            data: {'month': $(this).data('month'), 'year': $(this).data('year')},
+            success: function(data) {
+                $("#calendar").html(data);
+            }
+        });
+    });
 </script>
 </body>
 </html>

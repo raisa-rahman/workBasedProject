@@ -1,8 +1,17 @@
 <?php
 
 function desks($duration, $cleanup, $start, $end){
-    
     $slots = array();
+    $current = strtotime($start);
+    $end = strtotime($end);
+    
+    while ($current + $duration * 60 <= $end) {
+        $slotStart = date('H:i', $current);
+        $current += ($duration + $cleanup) * 60;
+        $slotEnd = date('H:i', $current);
+        $slots[] = $slotStart . ' - ' . $slotEnd;
+    }
+    
     return $slots;
 }
 ?>
@@ -18,25 +27,23 @@ function desks($duration, $cleanup, $start, $end){
           crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
     <style>
-    .bordered-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    .bordered-table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 20px;
-    }
-    .bordered-table th, .bordered-table td {
-        text-align: center;
-    }
-    .desk-button {
-        margin-bottom: 10px; /* Adjust the value to increase or decrease the gap */
-    }
-</style>
-
+        .bordered-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .bordered-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .bordered-table th, .bordered-table td {
+            text-align: center;
+        }
+        .desk-button {
+            margin-bottom: 10px; /* Adjust the value to increase or decrease the gap */
+        }
+    </style>
 </head>
-
 <body>
 
 <?php
@@ -54,6 +61,11 @@ function desks($duration, $cleanup, $start, $end){
    $currentYear = date("Y");
    $currentWeek = date("W");
    $currentMonth = date("F");
+
+   $weekStart = new DateTime();
+   $weekStart->setISODate($year, $week);
+   $weekEnd = clone $weekStart;
+   $weekEnd->modify('+6 days');
 ?>
 
 <div class="container">
@@ -61,7 +73,7 @@ function desks($duration, $cleanup, $start, $end){
         <div class="col-md-12">
             <center>
             <h1>Weekly Calendar</h1>
-            <h2><?php echo $currentMonth . " " . $currentYear;?></h2>
+            <h2><?php echo $weekStart->format('F Y');?></h2>
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . ($week + 1) . '&year=' . $year; ?>">Next Week</a>
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . $currentWeek . '&year=' . $currentYear; ?>">Current Week</a>
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . ($week - 1) . '&year=' . $year; ?>">Previous Week</a>
@@ -69,26 +81,26 @@ function desks($duration, $cleanup, $start, $end){
         <table class="table bordered-table">
                 <tr class="success">
                     <?php
-                    for ($day = 1; $day <= 7; $day++) {
-                        $d = strtotime($year . "W" . str_pad($week, 2, "0", STR_PAD_LEFT) . $day);
-                        if (date('d M Y', $d) == date('d M Y')) {
-                            echo "<td style='background:yellow'>" . date('l', $d) . "<br>" . date('d M Y', $d) . "</td>";
+                    for ($day = 0; $day < 7; $day++) {
+                        $d = clone $weekStart;
+                        $d->modify("+$day days");
+                        if ($d->format('Y-m-d') == date('Y-m-d')) {
+                            echo "<td style='background:yellow'>" . $d->format('l') . "<br>" . $d->format('d M Y') . "</td>";
                         } else {
-                            echo "<td>" . date('l', $d) . "<br>" . date('d M Y', $d) . "</td>";
+                            echo "<td>" . $d->format('l') . "<br>" . $d->format('d M Y') . "</td>";
                         }
                     }
                     ?>
                 </tr>
                 <tr>
                     <?php
-                    for ($day = 1; $day <= 7; $day++) {
+                    for ($day = 0; $day < 7; $day++) {
                         echo "<td>";
                         for ($desk = 1; $desk <= 12; $desk++) {
                             echo "<button class='btn btn-default btn-sm desk-button'>Desk $desk</button><br>";
                         }
                         echo "</td>";
                     }
-                    
                     ?>
                 </tr>
             </table>
