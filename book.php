@@ -6,7 +6,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-
 // Check if 'date' is set in GET request and assign to $date, or set a default date
 $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
@@ -87,11 +86,27 @@ function checkIfDeskBooked($desk, $date) {
             justify-content: center;
             align-items: center;
         }
+        .navbar-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
-<div class="container">
+<header class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="main.php">Home</a> <!-- Link to home page -->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="login.php">Logout</a> <!-- Link to logout page -->
+            </li>
+        </ul>
+    </div>
+</header>
+    
     <h1 class="text-center">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
     <hr>
     <?php if (isset($msg)) { echo $msg; } ?>
