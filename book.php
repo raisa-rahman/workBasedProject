@@ -18,7 +18,6 @@ if (!DateTime::createFromFormat('Y-m-d', $date)) {
 if (isset($_POST['submit'])) {
     // Sanitize POST data
     $name = htmlspecialchars($_POST['name']);
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $desk = htmlspecialchars($_POST['desk']);
 
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
@@ -27,8 +26,8 @@ if (isset($_POST['submit'])) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
-    $stmt = $mysqli->prepare("INSERT INTO bookings (name, email, date, desk) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param('ssss', $name, $email, $date, $desk);
+    $stmt = $mysqli->prepare("INSERT INTO bookings (name, date, desk) VALUES (?, ?,?)");
+    $stmt->bind_param('sss', $name, $date, $desk);
 
     if ($stmt->execute()) {
         $msg = "<div class='alert alert-success'>Booking Successful</div>";
@@ -65,7 +64,7 @@ function checkIfDeskBooked($desk, $date) {
 }
 ?>
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Booking System</title>
@@ -133,12 +132,10 @@ function checkIfDeskBooked($desk, $date) {
                         </div>
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input required type="text" name="name" class="form-control">
+                            <!-- Use PHP to echo the username from the session -->
+                            <input required type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input required type="email" name="email" class="form-control">
-                        </div>
+    
                         <div class="form-group pull-right">
                             <button class="btn btn-primary" type="submit" name="submit">Submit</button>
                         </div>
