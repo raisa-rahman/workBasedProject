@@ -25,7 +25,11 @@ if (isset($_POST['submit'])) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
-    $stmt = $mysqli->prepare("INSERT INTO bookings (name, date, desk) VALUES (?, ?,?)");
+    $stmt = $mysqli->prepare("INSERT INTO bookings (user_id, date, desk) VALUES (?, ?, ?)");
+    if ($stmt === false) {
+        die("Prepare failed: " . $mysqli->error);
+    }
+
     $stmt->bind_param('sss', $name, $date, $desk);
 
     if ($stmt->execute()) {
@@ -50,7 +54,11 @@ function checkIfDeskBooked($desk, $date) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
-    $stmt = $mysqli->prepare("SELECT name FROM bookings WHERE desk = ? AND date = ?");
+    $stmt = $mysqli->prepare("SELECT user_id FROM bookings WHERE desk = ? AND date = ?");
+    if ($stmt === false) {
+        die("Prepare failed: " . $mysqli->error);
+    }
+
     $stmt->bind_param('ss', $desk, $date);
     $stmt->execute();
     $stmt->bind_result($name);
