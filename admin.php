@@ -21,8 +21,15 @@ if (!isAdmin($user_id, $mysqli)) {
     die("Access denied. You do not have permission to view this page.");
 }
 
-// Prepare the SQL statement to get all bookings
-$stmt = $mysqli->prepare("SELECT b.id, b.desk, b.date, u.username FROM bookings b JOIN users u ON b.user_id = u.id ORDER BY b.date ASC");
+$dateFrom = $_POST['date_from'] ?? null;
+$dateTo = $_POST['date_to'] ?? null;
+
+if ($dateFrom && $dateTo) {
+    $stmt = $mysqli->prepare("SELECT b.id, b.desk, b.date, u.username FROM bookings b JOIN users u ON b.user_id = u.id WHERE b.date BETWEEN ? AND ? ORDER BY b.date ASC");
+    $stmt->bind_param("ss", $dateFrom, $dateTo);
+} else {
+    $stmt = $mysqli->prepare("SELECT b.id, b.desk, b.date, u.username FROM bookings b JOIN users u ON b.user_id = u.id ORDER BY b.date ASC");
+}
 
 // Check if prepare() failed
 if ($stmt === false) {
@@ -70,6 +77,21 @@ $mysqli->close();
 
 <div class="container">
     <h1 class="text-center">All Bookings</h1>
+    <form method="POST" action="">
+        <div class="form-row">
+            <div class="form-group col-md-5">
+                <label for="date_from">From</label>
+                <input type="date" class="form-control" id="date_from" name="date_from" required>
+            </div>
+            <div class="form-group col-md-5">
+                <label for="date_to">To</label>
+                <input type="date" class="form-control" id="date_to" name="date_to" required>
+            </div>
+            <div class="form-group col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
+            </div>
+        </div>
+    </form>
     <table class="table">
         <thead>
             <tr>
@@ -93,6 +115,11 @@ $mysqli->close();
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php if ($dateFrom && $dateTo): ?>
+        <div class="text-center">
+            <a href="download_report.php?date_from=<?php echo htmlspecialchars($dateFrom); ?>&date_to=<?php echo htmlspecialchars($dateTo); ?>" class="btn btn-success">Download Report</a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
