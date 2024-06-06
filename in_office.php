@@ -12,7 +12,12 @@ if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
-$stmt = $mysqli->prepare("SELECT desk, name FROM bookings WHERE date = ?");
+// Prepare the SQL statement and check for errors
+$stmt = $mysqli->prepare("SELECT desk, user_id FROM bookings WHERE date = ?");
+if ($stmt === false) {
+    die("Prepare failed: " . $mysqli->error);
+}
+
 $stmt->bind_param('s', $today);
 $stmt->execute();
 $stmt->bind_result($desk, $name);
