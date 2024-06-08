@@ -41,10 +41,9 @@ $mysqli->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <h2>Login</h2>
+            <h2>Login to Integrella's Desk Reservation System</h2>
             <?php if (isset($error)): ?>
                 <div class="alert alert-danger"><?= $error ?></div>
             <?php endif; ?>
