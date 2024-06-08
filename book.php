@@ -25,20 +25,37 @@ if (isset($_POST['submit'])) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
-    $stmt = $mysqli->prepare("INSERT INTO bookings (user_id, date, desk) VALUES (?, ?, ?)");
+    // Check if user has already booked a desk for the given date
+    $stmt = $mysqli->prepare("SELECT COUNT(*) FROM bookings WHERE user_id = ? AND date = ?");
     if ($stmt === false) {
         die("Prepare failed: " . $mysqli->error);
     }
 
-    $stmt->bind_param('sss', $name, $date, $desk);
+    $stmt->bind_param('ss', $_SESSION['user_id'], $date);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
 
-    if ($stmt->execute()) {
-        $msg = "<div class='alert alert-success'>Booking Successful</div>";
+    if ($count > 0) {
+        $msg = "<div class='alert alert-danger'>You have already booked a desk for this date.</div>";
     } else {
-        $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
+        $stmt = $mysqli->prepare("INSERT INTO bookings (user_id, date, desk) VALUES (?, ?, ?)");
+        if ($stmt === false) {
+            die("Prepare failed: " . $mysqli->error);
+        }
+
+        $stmt->bind_param('sss', $_SESSION['user_id'], $date, $desk);
+
+        if ($stmt->execute()) {
+            $msg = "<div class='alert alert-success'>Booking Successful</div>";
+        } else {
+            $msg = "<div class='alert alert-danger'>Booking Failed: You can only book 1 desk per day.";
+        }
+
+        $stmt->close();
     }
 
-    $stmt->close();
     $mysqli->close();
 }
 
