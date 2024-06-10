@@ -114,7 +114,6 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($booking['username']); ?></td>
                     <td>
                         <a href="cancel_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Cancel</a>
-                        <a href="edit_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-warning">Edit</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -143,6 +142,9 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($futureBooking['desk']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['name']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['date']); ?></td>
+                    <td>
+                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Cancel</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
