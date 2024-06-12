@@ -39,31 +39,66 @@ $mysqli->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .login-box {
+            border: 2px solid #4a148c;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+        .login-box h2 {
+            color: #4a148c;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            color: #4a148c;
+        }
+        .btn-primary {
+            background-color: #4a148c;
+            border-color: #4a148c;
+        }
+        .alert-danger {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+    </style>
 </head>
-<div class="container">
 <body>
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <h2>Login to Integrella's Desk Reservation System</h2>
-            <?php if (isset($error)): ?>
-                <div class="alert alert-danger"><?= $error ?></div>
-            <?php endif; ?>
-            <form action="login.php" method="post">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" name="username" id="username" class="form-control" required>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="login-box">
+                    <h2>Login to Integrella's Desk Reservation System</h2>
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger"><?= $error ?></div>
+                    <?php endif; ?>
+                    <form action="login.php" method="post">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" name="username" id="username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" id="password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>
+
 <?php
 
 // Example script to create a new user with hashed password
