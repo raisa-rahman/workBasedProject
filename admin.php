@@ -50,18 +50,18 @@ while ($stmt->fetch()) {
 $stmt->close();
 
 // Prepare the SQL statement to select all future bookings
-$stmt = $mysqli->prepare("SELECT desk, user_id, date FROM bookings WHERE date >= ?");
+$stmt = $mysqli->prepare("SELECT id, desk, user_id, date FROM bookings WHERE date >= ?");
 if ($stmt === false) {
     die("Prepare failed: " . $mysqli->error);
 }
 
 $stmt->bind_param('s', $today);
 $stmt->execute();
-$stmt->bind_result($desk, $name, $date);
+$stmt->bind_result($desk, $user_id, $date, $id);
 
 $futureBookings = [];
 while ($stmt->fetch()) {
-    $futureBookings[] = ["desk" => $desk, "name" => $name, "date" => $date];
+    $futureBookings[] = ["desk" => $desk, "user_id" => $user_id, "date" => $date];
 }
 
 $stmt->close();
@@ -112,9 +112,6 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($booking['desk']); ?></td>
                     <td><?php echo htmlspecialchars($booking['date']); ?></td>
                     <td><?php echo htmlspecialchars($booking['username']); ?></td>
-                    <td>
-                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Cancel</a>
-                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -140,10 +137,10 @@ $mysqli->close();
             <?php foreach ($futureBookings as $futureBooking): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($futureBooking['desk']); ?></td>
-                    <td><?php echo htmlspecialchars($futureBooking['name']); ?></td>
+                    <td><?php echo htmlspecialchars($futureBooking['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['date']); ?></td>
                     <td>
-                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Cancel</a>
+                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['desk']); ?>" class="btn btn-danger">Cancel</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -153,5 +150,17 @@ $mysqli->close();
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    <?php if (isset($_SESSION['cancellation_success'])): ?>
+        $(document).ready(function() {
+            <?php if ($_SESSION['cancellation_success']): ?>
+                alert('Cancellation successful.');
+            <?php else: ?>
+                alert('Error cancelling booking.');
+            <?php endif; ?>
+            <?php unset($_SESSION['cancellation_success']); ?>
+        });
+    <?php endif; ?>
+</script>
 </body>
 </html>

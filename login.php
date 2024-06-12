@@ -40,6 +40,7 @@ $mysqli->close();
     <title>Login</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 </head>
+<div class="container">
 <body>
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
