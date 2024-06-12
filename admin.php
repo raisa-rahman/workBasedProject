@@ -44,7 +44,7 @@ $stmt->bind_result($booking_id, $desk, $date, $username);
 
 $bookings = [];
 while ($stmt->fetch()) {
-    $bookings[] = ["id" => $booking_id, "desk" => $desk, "date" => $date, "username" => $username];
+    $bookings[] = ["desk" => $desk, "id" => $booking_id, "date" => $date, "username" => $username];
 }
 
 $stmt->close();
@@ -57,11 +57,11 @@ if ($stmt === false) {
 
 $stmt->bind_param('s', $today);
 $stmt->execute();
-$stmt->bind_result($desk, $user_id, $date, $id);
+$stmt->bind_result($id, $desk, $user_id, $date);
 
 $futureBookings = [];
 while ($stmt->fetch()) {
-    $futureBookings[] = ["desk" => $desk, "user_id" => $user_id, "date" => $date];
+    $futureBookings[] = ["id" => $id, "desk" => $desk, "user_id" => $user_id, "date" => $date];
 }
 
 $stmt->close();
@@ -112,6 +112,7 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($booking['desk']); ?></td>
                     <td><?php echo htmlspecialchars($booking['date']); ?></td>
                     <td><?php echo htmlspecialchars($booking['username']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['id']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -127,8 +128,9 @@ $mysqli->close();
     <table class="table">
         <thead>
             <tr>
+                <th>Booking ID</th>
                 <th>Desk</th>
-                <th>Name</th>
+                <th>User ID</th>
                 <th>Date</th>
                 <th>Actions</th>
             </tr>
@@ -136,11 +138,12 @@ $mysqli->close();
         <tbody>
             <?php foreach ($futureBookings as $futureBooking): ?>
                 <tr>
+                    <td><?php echo htmlspecialchars($futureBooking['id']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['desk']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['date']); ?></td>
                     <td>
-                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['desk']); ?>" class="btn btn-danger">Cancel</a>
+                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['id']); ?>" class="btn btn-danger">Cancel</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -153,11 +156,7 @@ $mysqli->close();
 <script>
     <?php if (isset($_SESSION['cancellation_success'])): ?>
         $(document).ready(function() {
-            <?php if ($_SESSION['cancellation_success']): ?>
-                alert('Cancellation successful.');
-            <?php else: ?>
-                alert('Error cancelling booking.');
-            <?php endif; ?>
+            alert('<?php echo $_SESSION['cancellation_success'] ? "Cancellation successful." : "Error cancelling booking."; ?>');
             <?php unset($_SESSION['cancellation_success']); ?>
         });
     <?php endif; ?>
