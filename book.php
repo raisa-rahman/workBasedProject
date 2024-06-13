@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -103,15 +102,17 @@ function checkIfDeskBooked($desk, $date) {
             color: white;
         }
         .desk-layout {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            position: relative;
             margin-top: 20px;
+            width: 100%; /* Adjust width as needed */
+            max-width: 1000px; /* Set a maximum width for larger images */
+        }
+        .desk-layout img {
+            width: 100%; /* Make the image fill the container */
+            height: auto; /* Maintain aspect ratio */
         }
         .desk-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: absolute;
         }
         .modal-header {
             background-color: #ffc107; /* Yellow */
@@ -143,71 +144,97 @@ function checkIfDeskBooked($desk, $date) {
     </div>
 </header>
     
-    <div class="container">
-        <h1 class="text-center mt-4">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
-        <hr>
-        <?php if (isset($msg)) { echo $msg; } ?>
-        <div class="desk-layout">
-            <?php foreach ($desk_options as $option): ?>
-                <div class="desk-item">
-                    <?php
-                        $btnClass = "btn-success"; // Default button class
-                        $disabled = ""; // Default not disabled
-                        $bookedName = checkIfDeskBooked($option, $date);
-                        if ($bookedName) {
-                            $btnClass = "btn-booked";
-                            $disabled = "disabled";
-                        }
-                    ?>
-                    <button class="btn <?php echo $btnClass; ?> book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-desk="<?php echo $option; ?>">
-                        <?php echo $option; ?><br>
-                        <?php if ($bookedName) echo "Booked by: " . $bookedName; ?>
-                    </button>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-
-    <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Booking: <span id="slot"></span></h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-md-12">
-                        <form action="" method="post">
-                            <div class="form-group">
-                                <label for="desk">Desk</label>
-                                <input required type="text" readonly name="desk" id="desk" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <!-- Use PHP to echo the username from the session -->
-                                <input required type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
-                            </div>
+<div class="container">
+    <h1 class="text-center mt-4">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
+    <hr>
+    <?php if (isset($msg)) { echo $msg; } ?>
+    <div class="desk-layout">
+        <img src="floorplan.jpeg" alt="Office Floorplan" class="img-fluid">
+        <?php 
+        $desk_positions = [
+            "Desk 1" => "top: 121px; left: 150px;",
+            "Desk 2" => "top: 188px; left: 150px;",
+            "Desk 3" => "top: 268px; left: 150px;",
+            "Desk 4" => "top: 111px; left: 248px;",
+            "Desk 5" => "top: 195px; left: 248px;",
+            "Desk 6" => "top: 288px; left: 248px;",
+            "Desk 7" => "top: 105px; left: 420px;",
+            "Desk 8" => "top: 195px; left: 420px;",
+            "Desk 9" => "top: 287px; left: 420px;",
+            "Desk 10" => "top: 178px; left: 510px;",
+            "Desk 11" => "top: 275px; left: 510px;"
+        ];
         
-                            <div class="form-group text-right">
-                                <button class="btn btn-primary" type="submit" name="submit">Submit</button>
-                            </div>
-                        </form>
-                    </div>
+        foreach ($desk_options as $option): 
+        ?>
+            <div class="desk-item" style="<?php echo $desk_positions[$option]; ?>">
+                <?php
+                    $btnClass = "btn-success"; // Default button class
+                    $bookedName = checkIfDeskBooked($option, $date);
+                    if ($bookedName) {
+                        $btnClass = "btn-booked";
+                    }
+                ?>
+                <div class="btn <?php echo $btnClass; ?> book" data-desk="<?php echo $option; ?>" data-booked="<?php echo $bookedName; ?>" style="border-radius: 50%; width: 30px; height: 30px;"></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Booking: <span id="slot"></span></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <form action="" method="post">
+                        <div class="form-group">
+                            <label for="desk">Desk</label>
+                            <input required type="text" readonly name="desk" id="desk" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <!-- Use PHP to echo the username from the session -->
+                            <input required type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
+                        </div>
+                        <div class="form-group text-right">
+                            <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".book").hover(function() {
+            var booked = $(this).attr('data-booked');
+            if (booked) {
+                $(this).attr('title', 'Booked by: ' + booked);
+            } else {
+                $(this).attr('title', 'Available');
+            }
+        });
+
         $(".book").click(function(){
             var desk = $(this).attr('data-desk');
-            $("#slot").html(desk);
-            $("#desk").val(desk);
-            $("#myModal").modal("show");
+            var booked = $(this).attr('data-booked');
+            if (!booked) {
+                $("#slot").html(desk);
+                $("#desk").val(desk);
+                $("#myModal").modal("show");
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>
+
