@@ -5,30 +5,36 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Ensure the booking ID is provided via GET parameter
 if (!isset($_GET['id'])) {
-    die("Invalid request. No booking ID specified.");
+    header("Location: main.php");
+    exit;
 }
 
-$bookingId = intval($_GET['id']); // Ensure the ID is an integer
+$booking_id = $_GET['id'];
 
 $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
+// Prepare and execute the DELETE statement
 $stmt = $mysqli->prepare("DELETE FROM bookings WHERE id = ?");
-$stmt->bind_param('i', $bookingId);
-
-if ($stmt->execute()) {
-    $_SESSION['cancellation_success'] = true;
+if ($stmt === false) {
+    $_SESSION['deletion_success'] = false;
 } else {
-    $_SESSION['cancellation_success'] = false;
+    $stmt->bind_param('i', $booking_id);
+    if ($stmt->execute()) {
+        $_SESSION['deletion_success'] = true;
+    } else {
+        $_SESSION['deletion_success'] = false;
+    }
+    $stmt->close();
 }
 
-$stmt->close();
 $mysqli->close();
 
-// Redirect to admin page
-header("Location:manage_bookings.php");
+// Redirect back to main page
+header("Location: manage_bookings.php");
 exit;
 ?>

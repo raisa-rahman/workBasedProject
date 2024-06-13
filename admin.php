@@ -176,8 +176,9 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($futureBooking['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['date']); ?></td>
                     <td>
-                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['id']); ?>" class="btn btn-danger">Cancel</a>
-                    </td>
+                    <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['id']); ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
+        
+                </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

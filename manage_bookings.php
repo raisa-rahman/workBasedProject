@@ -13,7 +13,7 @@ if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
-$stmt = $mysqli->prepare("SELECT date, desk, id FROM bookings WHERE user_id = 'admin' AND date >= ?");
+$stmt = $mysqli->prepare("SELECT date, desk, id FROM bookings WHERE user_id = 'test' AND date >= ?");
 if ($stmt === false) {
     die("Prepare failed: " . $mysqli->error);
 }
@@ -98,7 +98,8 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($booking['date']); ?></td>
                     <td><?php echo htmlspecialchars($booking['desk']); ?></td>
                     <td>
-                        <a href="delete_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Delete</a>
+                        <a href="delete_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Delete</a>
+
                     </td>
                 </tr>
             <?php endforeach; ?>
