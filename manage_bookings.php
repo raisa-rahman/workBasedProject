@@ -13,7 +13,6 @@ if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
-// Prepare the SQL statement and check for errors
 $stmt = $mysqli->prepare("SELECT date, desk, id FROM bookings WHERE user_id = 'admin' AND date >= ?");
 if ($stmt === false) {
     die("Prepare failed: " . $mysqli->error);
@@ -40,11 +39,37 @@ $mysqli->close();
     <title>Main Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        header {
+            background-color: #007bff; /* Blue */
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        h1 {
+            color: #6f42c1; /* Purple */
+        }
+        .btn-danger {
+            background-color: #dc3545; /* Bootstrap Red */
+            border-color: #dc3545;
+        }
+        .table thead {
+            background-color: #28a745; /* Green */
+            color: #fff;
+        }
+        .table tbody tr:hover {
+            background-color: #ffeb3b; /* Yellow */
+        }
+    </style>
 </head>
 <body>
 
 <!-- Header section with home and logout buttons -->
-<header class="navbar navbar-expand-lg navbar-light bg-light">
+<header class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="main.php">Home</a> <!-- Link to home page -->
         <ul class="navbar-nav ml-auto">
@@ -55,9 +80,9 @@ $mysqli->close();
     </div>
 </header>
 
-<div class="container">
+<div class="container my-5">
     <h1 class="text-center">Your Upcoming Desk Bookings</h1>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Booking ID</th>    
@@ -67,20 +92,20 @@ $mysqli->close();
             </tr>
         </thead>
         <tbody>
-            <?php 
-                 foreach ($bookings as $booking): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($booking['id']); ?></td>
-                        <td><?php echo htmlspecialchars($booking['date']); ?></td>
-                        <td><?php echo htmlspecialchars($booking['desk']); ?></td>
-                        <td>
-                            <a href="delete_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+            <?php foreach ($bookings as $booking): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($booking['id']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['date']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['desk']); ?></td>
+                    <td>
+                        <a href="delete_booking.php?id=<?php echo htmlspecialchars($booking['id']); ?>" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </div>
+
 <script>
     <?php if (isset($_SESSION['deletion_success'])): ?>
         $(document).ready(function() {

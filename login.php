@@ -102,8 +102,8 @@ $mysqli->close();
 <?php
 
 // Example script to create a new user with hashed password
-$username = 'admin';
-$password = 'admin';
+$username = 'test';
+$password = 'test123';
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');

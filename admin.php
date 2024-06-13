@@ -75,9 +75,42 @@ $mysqli->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Bookings (Admin)</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #4A90E2; /* Blue */
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .form-group label {
+            color: #6F42C1; /* Purple */
+        }
+        .btn-primary {
+            background-color: #28A745; /* Green */
+            border-color: #28A745;
+        }
+        .btn-success {
+            background-color: #FFC107; /* Yellow */
+            border-color: #FFC107;
+        }
+        h1 {
+            color: #4A90E2; /* Blue */
+            margin-bottom: 20px;
+        }
+        .table th {
+            background-color: #4A90E2; /* Blue */
+            color: #fff;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: #e9ecef;
+        }
+    </style>
 </head>
 <body>
-<header class="navbar navbar-expand-lg navbar-light bg-light">
+<header class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="main.php">Home</a>
         <ul class="navbar-nav ml-auto">

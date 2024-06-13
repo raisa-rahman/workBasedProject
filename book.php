@@ -79,8 +79,27 @@ function checkIfDeskBooked($desk, $date) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .navbar-custom {
+            background-color: #007bff; /* Blue */
+            color: white;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
         .btn-booked {
-            background-color: red;
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+        .btn-primary {
+            background-color: #6f42c1; /* Purple */
             color: white;
         }
         .desk-layout {
@@ -94,91 +113,101 @@ function checkIfDeskBooked($desk, $date) {
             justify-content: center;
             align-items: center;
         }
-        .navbar-custom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .modal-header {
+            background-color: #ffc107; /* Yellow */
+            color: #343a40;
+        }
+        .modal-title {
+            color: #343a40;
+        }
+        .alert-success {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+        .alert-danger {
+            background-color: #dc3545; /* Red */
+            color: white;
         }
     </style>
 </head>
 
 <body>
-<header class="navbar navbar-expand-lg navbar-light bg-light">
+<header class="navbar navbar-expand-lg navbar-light navbar-custom">
     <div class="container-fluid">
-        <a class="navbar-brand" href="main.php">Home</a> <!-- Link to home page -->
+        <a class="navbar-brand" href="main.php">Home</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="login.php">Logout</a> <!-- Link to logout page -->
+                <a class="nav-link" href="login.php">Logout</a>
             </li>
         </ul>
     </div>
 </header>
     
-    <h1 class="text-center">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
-    <hr>
-    <?php if (isset($msg)) { echo $msg; } ?>
-    <div class="desk-layout">
-        <?php foreach ($desk_options as $option): ?>
-            <div class="desk-item">
-                <?php
-                    $btnClass = "btn-success"; // Default button class
-                    $disabled = ""; // Default not disabled
-                    $bookedName = checkIfDeskBooked($option, $date);
-                    if ($bookedName) {
-                        $btnClass = "btn-booked";
-                        $disabled = "disabled";
-                    }
-                ?>
-                <button class="btn <?php echo $btnClass; ?> book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-desk="<?php echo $option; ?>">
-                    <?php echo $option; ?><br>
-                    <?php if ($bookedName) echo "Booked by: " . $bookedName; ?>
-                </button>
-            </div>
-        <?php endforeach; ?>
+    <div class="container">
+        <h1 class="text-center mt-4">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
+        <hr>
+        <?php if (isset($msg)) { echo $msg; } ?>
+        <div class="desk-layout">
+            <?php foreach ($desk_options as $option): ?>
+                <div class="desk-item">
+                    <?php
+                        $btnClass = "btn-success"; // Default button class
+                        $disabled = ""; // Default not disabled
+                        $bookedName = checkIfDeskBooked($option, $date);
+                        if ($bookedName) {
+                            $btnClass = "btn-booked";
+                            $disabled = "disabled";
+                        }
+                    ?>
+                    <button class="btn <?php echo $btnClass; ?> book" <?php echo $disabled; ?> data-toggle="modal" data-target="#myModal" data-desk="<?php echo $option; ?>">
+                        <?php echo $option; ?><br>
+                        <?php if ($bookedName) echo "Booked by: " . $bookedName; ?>
+                    </button>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
-</div>
 
-<div id="myModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Booking: <span id="slot"></span></h4>
-            </div>
-            <div class="modal-body">
-                <div class="col-md-12">
-                    <form action="" method="post">
-                        <div class="form-group">
-                            <label for="desk">Desk</label>
-                            <input required type="text" readonly name="desk" id="desk" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <!-- Use PHP to echo the username from the session -->
-                            <input required type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
-                        </div>
-    
-                        <div class="form-group pull-right">
-                            <button class="btn btn-primary" type="submit" name="submit">Submit</button>
-                        </div>
-                    </form>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Booking: <span id="slot"></span></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12">
+                        <form action="" method="post">
+                            <div class="form-group">
+                                <label for="desk">Desk</label>
+                                <input required type="text" readonly name="desk" id="desk" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <!-- Use PHP to echo the username from the session -->
+                                <input required type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
+                            </div>
+        
+                            <div class="form-group text-right">
+                                <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<script>
-    $(".book").click(function(){
-        var desk = $(this).attr('data-desk');
-        $("#slot").html(desk);
-        $("#desk").val(desk);
-        $("#myModal").modal("show");
-    });
-</script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(".book").click(function(){
+            var desk = $(this).attr('data-desk');
+            $("#slot").html(desk);
+            $("#desk").val(desk);
+            $("#myModal").modal("show");
+        });
+    </script>
 </body>
 </html>

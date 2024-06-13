@@ -5,11 +5,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Function to build a calendar for a specific month and year
 function build_calendar($month, $year, $room) {
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 
-    // Default room to first available if not specified
     if ($room == 0) {
         $room = $mysqli->query("SELECT id FROM rooms LIMIT 1")->fetch_assoc()['id'];
     }
@@ -77,7 +75,7 @@ function build_calendar($month, $year, $room) {
         if ($date < date('Y-m-d')) {
             $calendar .= "<td class='$today'><h4>$currentDay</h4><button class='btn btn-danger btn-xs' disabled>N/A</button>";
         } else {
-            if (in_array($date, $bookings) || $dayOfWeek == 0 || $dayOfWeek == 6) { // Disable booking for booked dates or weekends (Saturday and Sunday)
+            if (in_array($date, $bookings) || $dayOfWeek == 0 || $dayOfWeek == 6) {
                 $calendar .= "<td class='$today'><h4>$currentDay</h4><button class='btn btn-danger btn-xs' disabled>N/A</button>";
             } else {
                 $calendar .= "<td class='$today'><h4>$currentDay</h4><a href='book.php?date=$date&room=$room' class='btn btn-success btn-xs'>Book</a>";
@@ -101,13 +99,53 @@ function build_calendar($month, $year, $room) {
     return $calendar;
 }
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <style>
-        @media only screen and (max-width: 760px),
-        (min-device-width: 802px) and (max-device-width: 1020px) {
+        body {
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #007BFF;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+        }
+        .calendar-container {
+            margin-top: 20px;
+        }
+        .table {
+            background-color: white;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .today {
+            background-color: yellow !important;
+        }
+        .btn-primary {
+            background-color: #007BFF;
+            border-color: #007BFF;
+        }
+        .btn-danger {
+            background-color: #DC3545;
+            border-color: #DC3545;
+        }
+        .btn-success {
+            background-color: #28A745;
+            border-color: #28A745;
+        }
+        .btn-xs {
+            font-size: 0.8em;
+        }
+        @media (max-width: 760px) {
             table, thead, tbody, th, td, tr {
                 display: block;
             }
@@ -133,31 +171,27 @@ function build_calendar($month, $year, $room) {
             td:nth-of-type(6):before { content: "Friday"; }
             td:nth-of-type(7):before { content: "Saturday"; }
         }
-        @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-            body { padding: 0; margin: 0; }
-        }
-        @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
-            body { width: 495px; }
-        }
         @media (min-width: 641px) {
             table { table-layout: fixed; }
             td { width: 33%; }
         }
-        .row { margin-top: 20px; }
-        .today { background-color: yellow; }
+        .row {
+            margin-top: 20px;
+        }
     </style>
-    <header class="navbar navbar-expand-lg navbar-light bg-light">
+    <title>Booking Calendar</title>
+</head>
+<body>
+<header class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="main.php">Home</a> <!-- Link to home page -->
+        <a class="navbar-brand" href="main.php">Home</a>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="login.php">Logout</a> <!-- Link to logout page -->
+                <a class="nav-link" href="login.php">Logout</a>
             </li>
         </ul>
     </div>
 </header>
-</head>
-<body>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
