@@ -152,17 +152,17 @@ function checkIfDeskBooked($desk, $date) {
         <img src="floorplan.jpeg" alt="Office Floorplan" class="img-fluid">
         <?php 
         $desk_positions = [
-            "Desk 1" => "top: 121px; left: 150px;",
-            "Desk 2" => "top: 188px; left: 150px;",
-            "Desk 3" => "top: 268px; left: 150px;",
-            "Desk 4" => "top: 111px; left: 248px;",
-            "Desk 5" => "top: 195px; left: 248px;",
-            "Desk 6" => "top: 288px; left: 248px;",
-            "Desk 7" => "top: 105px; left: 420px;",
-            "Desk 8" => "top: 195px; left: 420px;",
-            "Desk 9" => "top: 287px; left: 420px;",
-            "Desk 10" => "top: 178px; left: 510px;",
-            "Desk 11" => "top: 275px; left: 510px;"
+            "Desk 1" => "top: 183px; left: 232px;",
+            "Desk 2" => "top: 280px; left: 232px;",
+            "Desk 3" => "top: 395px; left: 232px;",
+            "Desk 4" => "top: 170px; left: 360px;",
+            "Desk 5" => "top: 290px; left: 360px;",
+            "Desk 6" => "top: 425px; left: 360px;",
+            "Desk 7" => "top: 160px; left: 625px;",
+            "Desk 8" => "top: 290px; left: 625px;",
+            "Desk 9" => "top: 425px; left: 625px;",
+            "Desk 10" => "top: 265px; left: 740px;",
+            "Desk 11" => "top: 405px; left: 740px;"
         ];
         
         foreach ($desk_options as $option): 
