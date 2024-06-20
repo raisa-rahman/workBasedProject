@@ -1,8 +1,11 @@
 <?php
+// Start the session to check if the user is logged in
 session_start();
+
+// If user is not logged in, redirect to login page
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
-    exit;
+    exit; // Stop further execution
 }
 ?>
 

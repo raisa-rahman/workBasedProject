@@ -2,43 +2,44 @@
 
 // Function to build a calendar for a specific month and year
 function build_calendar($month, $year){
-    // Create array of days of the week
+    // Create an array of days of the week
     $daysOfWeek = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
     
-    // Get first day of the month
+    // Get the first day of the month
     $firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
 
-    // Get number of days in the month
+    // Get the number of days in the month
     $numberDays = date('t', $firstDayOfMonth);
 
     // Get information about the first day of the month
     $dateComponents = getdate($firstDayOfMonth);
 
-    // Get name of the month
+    // Get the name of the month
     $monthName = $dateComponents['month'];
 
-    // Get index value of the first day of the month
+    // Get the index value of the first day of the month
     $dayOfWeek = ($dateComponents['wday'] + 6) % 7;
 
-    // Get current date
+    // Get the current date
     $dateToday = date('Y-m-d');
 
-    // Create HTML table
+    // Create HTML table for the calendar
     $calendar = "<table class='table table-bordered'>";
     $calendar .= "<center><h2>$monthName $year</h2>";
+    // Create navigation buttons for previous and next months
     $calendar .= "<a class='btn btn-xs btn-primary' href='?month=".date('m', mktime(0, 0, 0, $month-1, 1, $year))."&year=".date('Y', mktime(0, 0, 0, $month-1, 1, $year))."'>Previous Month</a>";
     $calendar .= "<a class='btn btn-xs btn-primary' href='?month=".date('m', mktime(0, 0, 0, $month+1, 1, $year))."&year=".date('Y', mktime(0, 0, 0, $month+1, 1, $year))."'>Next Month</a></center>";
 
     $calendar .= "<tr>";
 
-    // Create calendar headers
+    // Create calendar headers with days of the week
     foreach($daysOfWeek as $day){
         $calendar .= "<th class='header'>$day</th>";
     }
 
     $calendar .= "</tr><tr>";
 
-    // $dayOfWeek ensures there are only 7 columns on table
+    // Ensure there are only 7 columns in the table by adding empty cells if necessary
     if($dayOfWeek > 0){
         for($k = 0; $k < $dayOfWeek; $k++){
             $calendar .= "<td></td>";
@@ -48,9 +49,10 @@ function build_calendar($month, $year){
     // Initiate day counter
     $currentDay = 1;
 
-    // Get the month number
+    // Get the month number in two-digit format
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
 
+    // Loop through all the days of the month
     while($currentDay <= $numberDays){
 
         // If it's the seventh column (Sunday), start a new row
@@ -59,9 +61,11 @@ function build_calendar($month, $year){
             $calendar .= "</tr><tr>";
         }
 
+        // Format the current day with leading zero if necessary
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
 
+        // Highlight today's date
         if($dateToday == $date){
             $calendar .= "<td class='today'>$currentDay</td>";
         } else {
@@ -74,7 +78,7 @@ function build_calendar($month, $year){
 
     }
 
-    // Complete the row of the last week in month, if necessary
+    // Complete the row of the last week in the month, if necessary
     if($dayOfWeek != 7){
         $remainingDays = 7 - $dayOfWeek;
         for($i = 0; $i < $remainingDays; $i++){
@@ -82,6 +86,7 @@ function build_calendar($month, $year){
         }
     }
 
+    // Close the table row and table
     $calendar .= "</tr>";
     $calendar .= "</table>";
 
@@ -99,9 +104,11 @@ function build_calendar($month, $year){
             <div class="row">
                 <div class="col-md-12">
                     <?php
+                    // Get current date components
                     $dateComponents = getdate();
                     $month = $dateComponents['mon'];
                     $year = $dateComponents['year'];
+                    // Output the calendar for the current month and year
                     echo build_calendar($month, $year);
                     ?>
                 </div>

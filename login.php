@@ -1,14 +1,16 @@
 <?php
+// Start session to manage user login state
 session_start();
 
 // Database connection
 $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 
+// Check if the form is submitted (POST method)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Prepare and execute the SQL statement
+    // Prepare and execute the SQL statement to fetch user credentials
     $stmt = $mysqli->prepare("SELECT id, password FROM users WHERE username = ?");
     $stmt->bind_param('s', $username);
     $stmt->execute();
@@ -16,19 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_result($id, $hashed_password);
     $stmt->fetch();
 
+    // Verify if user exists and password matches the hashed password
     if ($stmt->num_rows > 0 && password_verify($password, $hashed_password)) {
-        // Successful login
+        // Successful login: set session variables and redirect
         $_SESSION['user_id'] = $id;
         $_SESSION['username'] = $username;
         header("Location: main.php");
     } else {
-        // Invalid login
+        // Invalid login: set error message
         $error = "Invalid username or password.";
     }
 
+    // Close the statement
     $stmt->close();
 }
 
+// Close the database connection
 $mysqli->close();
 ?>
 
@@ -100,7 +105,6 @@ $mysqli->close();
 </html>
 
 <?php
-
 // Example script to create a new user with hashed password
 $username = 'test';
 $password = 'test123';

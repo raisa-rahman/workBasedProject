@@ -1,28 +1,30 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+session_start();  // Start the session
+if (!isset($_SESSION['user_id'])) {  // Check if the user is logged in
+    header("Location: login.php");  // If not logged in, redirect to login page
     exit;
 }
 
 require 'functions.php';  // Ensure the isAdmin function is defined in this file
 
-$user_id = $_SESSION['user_id'];
-$today = date('Y-m-d');
+$user_id = $_SESSION['user_id'];  // Get the user ID from the session
+$today = date('Y-m-d');  // Get the current date
 
+// Connect to the database
 $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
+if ($mysqli->connect_error) {  // Check for connection errors
+    die("Connection failed: " . $mysqli->connect_error);  // Stop script if connection fails
 }
 
 // Check if the user is an admin
 if (!isAdmin($user_id, $mysqli)) {
-    die("Access denied. You do not have permission to view this page.");
+    die("Access denied. You do not have permission to view this page.");  // Stop script if user is not an admin
 }
 
-$dateFrom = $_POST['date_from'] ?? null;
-$dateTo = $_POST['date_to'] ?? null;
+$dateFrom = $_POST['date_from'] ?? null;  // Get the date_from from the POST request
+$dateTo = $_POST['date_to'] ?? null;  // Get the date_to from the POST request
 
+// Prepare SQL statement based on whether date range is provided
 if ($dateFrom && $dateTo) {
     $stmt = $mysqli->prepare("SELECT b.id, b.desk, b.date, u.username FROM bookings b JOIN users u ON b.user_id = u.id WHERE b.date BETWEEN ? AND ? ORDER BY b.date ASC");
     $stmt->bind_param("ss", $dateFrom, $dateTo);
@@ -30,42 +32,42 @@ if ($dateFrom && $dateTo) {
     $stmt = $mysqli->prepare("SELECT b.id, b.desk, b.date, u.username FROM bookings b JOIN users u ON b.user_id = u.id ORDER BY b.date ASC");
 }
 
-if ($stmt === false) {
-    die("Prepare failed: " . htmlspecialchars($mysqli->error));
+if ($stmt === false) {  // Check for errors in preparing the statement
+    die("Prepare failed: " . htmlspecialchars($mysqli->error));  // Stop script if there is an error
 }
 
-$stmt->execute();
+$stmt->execute();  // Execute the prepared statement
 
-if ($stmt->error) {
-    die("Execute failed: " . htmlspecialchars($stmt->error));
+if ($stmt->error) {  // Check for errors in executing the statement
+    die("Execute failed: " . htmlspecialchars($stmt->error));  // Stop script if there is an error
 }
 
-$stmt->bind_result($booking_id, $desk, $date, $username);
+$stmt->bind_result($booking_id, $desk, $date, $username);  // Bind the result variables
 
 $bookings = [];
-while ($stmt->fetch()) {
+while ($stmt->fetch()) {  // Fetch the results into the bookings array
     $bookings[] = ["desk" => $desk, "id" => $booking_id, "date" => $date, "username" => $username];
 }
 
-$stmt->close();
+$stmt->close();  // Close the statement
 
 // Prepare the SQL statement to select all future bookings
 $stmt = $mysqli->prepare("SELECT id, desk, user_id, date FROM bookings WHERE date >= ?");
-if ($stmt === false) {
-    die("Prepare failed: " . $mysqli->error);
+if ($stmt === false) {  // Check for errors in preparing the statement
+    die("Prepare failed: " . $mysqli->error);  // Stop script if there is an error
 }
 
-$stmt->bind_param('s', $today);
-$stmt->execute();
-$stmt->bind_result($id, $desk, $user_id, $date);
+$stmt->bind_param('s', $today);  // Bind the parameter
+$stmt->execute();  // Execute the prepared statement
+$stmt->bind_result($id, $desk, $user_id, $date);  // Bind the result variables
 
 $futureBookings = [];
-while ($stmt->fetch()) {
+while ($stmt->fetch()) {  // Fetch the results into the futureBookings array
     $futureBookings[] = ["id" => $id, "desk" => $desk, "user_id" => $user_id, "date" => $date];
 }
 
-$stmt->close();
-$mysqli->close();
+$stmt->close();  // Close the statement
+$mysqli->close();  // Close the database connection
 ?>
 
 <!doctype html>
@@ -176,9 +178,8 @@ $mysqli->close();
                     <td><?php echo htmlspecialchars($futureBooking['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($futureBooking['date']); ?></td>
                     <td>
-                    <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['id']); ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
-        
-                </td>
+                        <a href="cancel_booking.php?id=<?php echo htmlspecialchars($futureBooking['id']); ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

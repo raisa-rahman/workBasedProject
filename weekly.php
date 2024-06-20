@@ -5,6 +5,7 @@ function desks($duration, $cleanup, $start, $end){
     $current = strtotime($start);
     $end = strtotime($end);
     
+    // Loop to generate time slots
     while ($current + $duration * 60 <= $end) {
         $slotStart = date('H:i', $current);
         $current += ($duration + $cleanup) * 60;
@@ -12,8 +13,10 @@ function desks($duration, $cleanup, $start, $end){
         $slots[] = $slotStart . ' - ' . $slotEnd;
     }
     
-    return $slots;
+    return $slots; // Return array of time slots
 }
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +52,7 @@ function desks($duration, $cleanup, $start, $end){
 </body>
 </html>
 
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -84,6 +87,7 @@ function desks($duration, $cleanup, $start, $end){
    $year = isset($_GET['year']) ? $_GET['year'] : date("Y");
    $week = isset($_GET['week']) ? $_GET['week'] : date("W");
 
+   // Adjusting year and week based on user input or current date
    if ($week > 53) {
        $year++;
        $week = 1;
@@ -92,10 +96,12 @@ function desks($duration, $cleanup, $start, $end){
        $week = 53;
    }
 
+   // Variables for current date values
    $currentYear = date("Y");
    $currentWeek = date("W");
    $currentMonth = date("F");
 
+   // Determining the start and end of the week
    $weekStart = new DateTime();
    $weekStart->setISODate($year, $week);
    $weekEnd = clone $weekStart;
@@ -108,16 +114,20 @@ function desks($duration, $cleanup, $start, $end){
             <center>
             <h1>Weekly Calendar</h1>
             <h2><?php echo $weekStart->format('F Y');?></h2>
+            <!-- Navigation links for different weeks -->
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . ($week + 1) . '&year=' . $year; ?>">Next Week</a>
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . $currentWeek . '&year=' . $currentYear; ?>">Current Week</a>
             <a class="btn btn-primary btn-xs" href="<?php echo $_SERVER['PHP_SELF'] . '?week=' . ($week - 1) . '&year=' . $year; ?>">Previous Week</a>
             </center>
-        <table class="table bordered-table">
+            <!-- Table for displaying the weekly calendar -->
+            <table class="table bordered-table">
                 <tr class="success">
                     <?php
+                    // Displaying the days of the week
                     for ($day = 0; $day < 7; $day++) {
                         $d = clone $weekStart;
                         $d->modify("+$day days");
+                        // Highlighting the current day
                         if ($d->format('Y-m-d') == date('Y-m-d')) {
                             echo "<td style='background:yellow'>" . $d->format('l') . "<br>" . $d->format('d M Y') . "</td>";
                         } else {
@@ -128,6 +138,7 @@ function desks($duration, $cleanup, $start, $end){
                 </tr>
                 <tr>
                     <?php
+                    // Displaying desks for each day of the week
                     for ($day = 0; $day < 7; $day++) {
                         echo "<td>";
                         for ($desk = 1; $desk <= 12; $desk++) {

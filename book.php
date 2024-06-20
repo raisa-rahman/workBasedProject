@@ -1,72 +1,90 @@
 <?php
+// Start a new session or resume the existing session
 session_start();
+
+// If the user is not logged in, redirect them to the login page
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Check if 'date' is set in GET request and assign to $date, or set a default date
+// Check if 'date' is set in the GET request and assign it to $date, or set a default date
 $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
-// Validate the date format
+// Validate the date format to ensure it's 'Y-m-d'
 if (!DateTime::createFromFormat('Y-m-d', $date)) {
     die("Invalid date format");
 }
 
+// Check if the form has been submitted
 if (isset($_POST['submit'])) {
-    // Sanitize POST data
+    // Sanitize POST data to prevent XSS
     $name = htmlspecialchars($_POST['name']);
     $desk = htmlspecialchars($_POST['desk']);
 
+    // Create a new MySQLi connection
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 
+    // Check for connection errors
     if ($mysqli->connect_error) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
+    // Prepare an SQL statement for inserting a new booking
     $stmt = $mysqli->prepare("INSERT INTO bookings (user_id, date, desk) VALUES (?, ?, ?)");
     if ($stmt === false) {
         die("Prepare failed: " . $mysqli->error);
     }
 
+    // Bind parameters to the SQL statement
     $stmt->bind_param('sss', $name, $date, $desk);
 
+    // Execute the SQL statement and set a success or failure message
     if ($stmt->execute()) {
         $msg = "<div class='alert alert-success'>Booking Successful</div>";
     } else {
         $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
     }
 
+    // Close the statement and the MySQLi connection
     $stmt->close();
     $mysqli->close();
 }
 
+// Define an array of desk options
 $desk_options = array(
     "Desk 1", "Desk 2", "Desk 3", "Desk 4", "Desk 5",
     "Desk 6", "Desk 7", "Desk 8", "Desk 9", "Desk 10", "Desk 11"
 );
 
+// Function to check if a desk is already booked for a given date
 function checkIfDeskBooked($desk, $date) {
+    // Create a new MySQLi connection
     $mysqli = new mysqli('localhost', 'root', '', 'bookingcalendar');
 
+    // Check for connection errors
     if ($mysqli->connect_error) {
         die("Connection failed: " . $mysqli->connect_error);
     }
 
+    // Prepare an SQL statement for checking desk bookings
     $stmt = $mysqli->prepare("SELECT user_id FROM bookings WHERE desk = ? AND date = ?");
     if ($stmt === false) {
         die("Prepare failed: " . $mysqli->error);
     }
 
+    // Bind parameters to the SQL statement
     $stmt->bind_param('ss', $desk, $date);
     $stmt->execute();
     $stmt->bind_result($name);
     $stmt->fetch();
 
+    // Close the statement and the MySQLi connection
     $stmt->close();
     $mysqli->close();
 
-    return $name ? $name : null; // Return the name if booked, null otherwise
+    // Return the name if the desk is booked, null otherwise
+    return $name ? $name : null;
 }
 ?>
 
@@ -151,6 +169,7 @@ function checkIfDeskBooked($desk, $date) {
     <div class="desk-layout">
         <img src="floorplan.jpeg" alt="Office Floorplan" class="img-fluid">
         <?php 
+        // Define the positions of the desks on the floor plan
         $desk_positions = [
             "Desk 1" => "top: 183px; left: 232px;",
             "Desk 2" => "top: 280px; left: 232px;",
@@ -165,10 +184,12 @@ function checkIfDeskBooked($desk, $date) {
             "Desk 11" => "top: 405px; left: 740px;"
         ];
         
+        // Loop through each desk option
         foreach ($desk_options as $option): 
         ?>
             <div class="desk-item" style="<?php echo $desk_positions[$option]; ?>">
                 <?php
+                    // Determine the button class based on booking status
                     $btnClass = "btn-success"; // Default button class
                     $bookedName = checkIfDeskBooked($option, $date);
                     if ($bookedName) {
@@ -215,6 +236,7 @@ function checkIfDeskBooked($desk, $date) {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Show tooltip on hover indicating booking status
         $(".book").hover(function() {
             var booked = $(this).attr('data-booked');
             if (booked) {
@@ -224,6 +246,7 @@ function checkIfDeskBooked($desk, $date) {
             }
         });
 
+        // Open the booking modal if the desk is available
         $(".book").click(function(){
             var desk = $(this).attr('data-desk');
             var booked = $(this).attr('data-booked');
@@ -237,4 +260,3 @@ function checkIfDeskBooked($desk, $date) {
 </script>
 </body>
 </html>
-
